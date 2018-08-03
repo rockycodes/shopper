@@ -5,7 +5,7 @@ import React from 'react';
 import enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import OrderList from './Orders/OrderList';
-import OrderBox from './Orders/OrderBox';
+import { OrderBox } from './Orders/OrderBox';
 
 
 const adapter = new Adapter();

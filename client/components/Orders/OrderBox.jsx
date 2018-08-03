@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import { OrderForm } from '../index.js'
 import { Link, Switch } from 'react-router-dom';
 
-class OrderBox extends Component {
+export class OrderBox extends Component {
     constructor(props) {
         super(props)
         this.state = {
