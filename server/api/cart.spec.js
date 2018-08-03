@@ -154,23 +154,23 @@ describe("Cart routes", () => {
     })
 
 
-    describe('add product to cart', () => {
-      xit('successfully adds a product to that user\'s cart', () => {
-        return authenticatedUser.post('/api/cart')
-          .send(productOne)
-          .expect(200)
-          .then(res => {
-            const cartItem = res.body[0][0].dataValues;
-            return cartItem
-          })
-          .then(foundItem => {
-            expect(foundItem.title)
-            .to.be.equal(productOne.title)
-          })
+    // describe('add product to cart', () => {
+    //   xit('successfully adds a product to that user\'s cart', () => {
+    //     return authenticatedUser.post('/api/cart')
+    //       .send(productOne)
+    //       .expect(200)
+    //       .then(res => {
+    //         const cartItem = res.body[0][0].dataValues;
+    //         return cartItem
+    //       })
+    //       .then(foundItem => {
+    //         expect(foundItem.title)
+    //         .to.be.equal(productOne.title)
+    //       })
 
 
-      })
-    })
+    //   })
+    // })
 
 
 
