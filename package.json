@@ -34,7 +34,6 @@
     "fs-misc": "^2.0.0",
     "history": "^4.6.3",
     "morgan": "^1.8.1",
-    "node-sass": "^4.9.2",
     "passport": "^0.3.2",
     "passport-google-oauth": "^1.0.0",
     "pg": "^6.1.2",
@@ -52,8 +51,7 @@
     "sass": "^1.2.1",
     "sequelize": "^4.3.1",
     "sinon": "^4.5.0",
-    "socket.io": "^2.0.3",
-    "webpack-cli": "^3.1.0"
+    "socket.io": "^2.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",
@@ -77,6 +75,7 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-mock-store": "^1.2.3",
     "supertest": "^3.0.0",
-    "webpack": "^4.0.1"
+    "webpack": "^4.16.4",
+    "webpack-cli": "^3.1.0"
   }
 }
