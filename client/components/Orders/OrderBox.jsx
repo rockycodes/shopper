@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import { OrderForm } from '../index.js'
-import { Link, Switch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export class OrderBox extends Component {
     constructor(props) {
