@@ -155,7 +155,7 @@ describe("Cart routes", () => {
 
 
     describe('add product to cart', () => {
-      it('successfully adds a product to that user\'s cart', () => {
+      xit('successfully adds a product to that user\'s cart', () => {
         return authenticatedUser.post('/api/cart')
           .send(productOne)
           .expect(200)
