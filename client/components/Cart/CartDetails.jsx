@@ -2,22 +2,27 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { removeItemFromCart } from '../../store';
 
-//want to show a cart with only unique items (newSet?)
-//want to calculate quantity for each item (reduce)
+//has the product ids to an array with a count
 
 function CartDetails(props) {
   const cart = props.cart;
   const products = props.products;
-  const productsArr = []
+  let productsArr = []
+  let productsObj = {}
   //USE PRODUCTID FROM THE CART ARRAY TO MAKE AN ARRAY OF ACTUAL PRODUCT INFO
   if (cart.length > 0 ){
-    cart.forEach(entry => {
-      let productId = entry.productId;
-      const [productToReturn] = products.filter(product => {
+    cart.forEach(productIdStr => {
+      //hash the product ids to an obj
+      productsObj[productIdStr] ? productsObj[productIdStr]++ : productsObj[productIdStr] = 1
+    })
+    const idArr = Object.keys(productsObj)
+    idArr.forEach((id) => {
+      const productId = Number(id)
+      const productToReturn = products.filter(product => {
         return product.id === productId;
       });
-      productsArr.push(productToReturn);
-    });
+      if (productToReturn[0]) productsArr.push(productToReturn[0]);
+    })
   }
   let totalItems;
   //IF THE CART HAS LENGTH, ADD UP THE TOTAL QUANTITY
@@ -34,7 +39,7 @@ function CartDetails(props) {
         <h3>Total Items: {totalItems}</h3>
       </div>
       <div className="productOrderBox">
-        {productsArr.map( (product, index) => {
+        {productsArr.map( (product) => {
           return (
             <div className="singleProductOrder" key={product.title}>
               <img src={product.img} />
@@ -43,7 +48,7 @@ function CartDetails(props) {
                 <p>{product.price}</p>
               </div>
               <div>
-                <p> Quantity: {cart[index].quantity}</p>
+                <p> Quantity: {productsObj[product.id]}</p>
               </div>
               <div className="orderBtn">
                 <button onClick={() => props.removeItemFromCart(product)}>Remove</button>
