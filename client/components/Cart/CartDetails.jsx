@@ -24,19 +24,12 @@ function CartDetails(props) {
       if (productToReturn[0]) productsArr.push(productToReturn[0]);
     })
   }
-  let totalItems;
-  //IF THE CART HAS LENGTH, ADD UP THE TOTAL QUANTITY
-  cart.length > 0
-  ? totalItems = cart.reduce((total, item) => {
-      return total + item.quantity;
-    }, 0)
-  : totalItems = 0
 
   return (
     cart.length ?
     <div className="orderBox">
       <div className="headerBox">
-        <h3>Total Items: {totalItems}</h3>
+        <h3>Total Items: {cart.length}</h3>
       </div>
       <div className="productOrderBox">
         {productsArr.map( (product) => {
