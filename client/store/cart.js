@@ -51,8 +51,7 @@ export const addGuestItemToCart = (productId) => dispatch => {
 }
   
 
-export const removeItemFromCart = (product) => {
-  return (dispatch) =>
+export const removeItemFromCart = (product) => (dispatch) => {
   axios
     .delete(`/api/cart/${product.id}`)
     .then(() => {
@@ -62,6 +61,19 @@ export const removeItemFromCart = (product) => {
     })
     .catch(err => console.log(err));
   }
+
+export const removeGuestItemFromCart = (productId) => dispatch => {
+  console.log("productId", productId)
+  let guestCart = localStorage.getItem('cart').split(',')
+  let index = guestCart.indexOf(productId.toString())
+  guestCart.splice(index, 1)
+  let updatedCart = guestCart.join(',')
+  console.log("cart to be set on storage", updatedCart)
+  localStorage.setItem('cart', updatedCart)
+  console.log("cart to be set on store in reducer", guestCart)
+  let action = getCart(guestCart)
+  dispatch(action)
+}
 
 export const getTheCart = () => dispatch => {
     axios
