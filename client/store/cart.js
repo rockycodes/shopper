@@ -63,19 +63,27 @@ export const removeItemFromCart = (product) => (dispatch) => {
   }
 
 export const removeGuestItemFromCart = (productId) => dispatch => {
-  console.log("productId", productId)
   let guestCart = localStorage.getItem('cart').split(',')
   let index = guestCart.indexOf(productId.toString())
   guestCart.splice(index, 1)
   let updatedCart = guestCart.join(',')
-  console.log("cart to be set on storage", updatedCart)
   localStorage.setItem('cart', updatedCart)
-  console.log("cart to be set on store in reducer", guestCart)
   let action = getCart(guestCart)
   dispatch(action)
 }
 
 export const getTheCart = () => dispatch => {
+  //check if there is a cart on local storage, if there is, post it to the backend and then get the cart
+    if (localStorage.getItem('cart')) {
+      let guestCart = localStorage.getItem('cart').split(',')
+        axios
+        .post(`/api/cart`, guestCart)
+        .then(res => {
+        let action = getCart(res.data);
+        dispatch(action);
+        localStorage.removeItem('cart')
+      })
+    }
     axios
       .get('/api/cart')
       .then(res => {
@@ -103,8 +111,6 @@ export default function(state = cart, action) {
   switch (action.type) {
     case GET_CART:
       return action.cart;
-    // case ADD_TO_CART:
-    //   return [...state, action.product];
     case REMOVE_FROM_CART:
       return [...state.filter(item => item.productId !== action.productId)];
     case CLEAR_CART:

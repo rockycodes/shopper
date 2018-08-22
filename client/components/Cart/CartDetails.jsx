@@ -71,7 +71,6 @@ const mapDispatchToProps = dispatch => {
       dispatch(removeItemFromCart(product));
     },
     removeGuestItemFromCart(productId) {
-      console.log('in remove guestItem')
       dispatch(removeGuestItemFromCart(productId))
     }
   };

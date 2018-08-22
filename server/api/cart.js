@@ -8,6 +8,9 @@ module.exports = router;
               /* ///////// */
 
 router.get('/', (req, res, next) => {
+  console.log("req.session.passport", req.session.passport)
+  console.log("req.session", req.session)
+
   let userId = req.session.passport.user;
   Cart.findAll({where: { userId }})
   .then((cart) => {
@@ -21,11 +24,14 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   let num = req.body.productQuantity || 1;
-  let productId = +req.body.productId;
+  let cart = [req.body.productId] || req.body.guestCart;
                 /* IF THE USER IS LOGGED IN*/
   if (req.session.passport && req.session.passport.user) {
     const userId = req.session.passport.user;
-    Cart.findOne({ where: { userId, productId } })
+    //do promise.all on the cart?
+    Promise.all(cart.map((productIdStr) => {
+      const productId = +productIdStr
+      Cart.findOne({ where: { userId, productId } })
       .then(item => {
         /* IF THE ITEM IS ALREADY PRESENT*/
         if (item) {
@@ -49,9 +55,12 @@ router.post('/', (req, res, next) => {
           });
         }
       })
+    }))
       .catch(next);
-  } 
+  }
 })
+
+
             /* /////////// */
         /* DELETE ITEM FROM CART */
           /* ///////////// */
