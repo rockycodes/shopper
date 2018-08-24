@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const { User, Cart, Order, Product, GuestCart, Guest } = require('../db/models');
-const { isLoggedIn } = require('../../utils');
+const { User, Cart } = require('../db/models');
 module.exports = router;
 
               /* ////////// */
@@ -8,15 +7,18 @@ module.exports = router;
               /* ///////// */
 
 router.get('/', (req, res, next) => {
-  console.log("req.session.passport", req.session.passport)
-  console.log("req.session", req.session)
-
-  let userId = req.session.passport.user;
+  let userId = req.user.id;
   Cart.findAll({where: { userId }})
   .then((cart) => {
-    let idCart = cart.map((product) => product.id)
+    let idCart = []
+    cart.forEach((product) => {
+      for (let i = 0; i < product.quantity; i++) {
+        idCart.push(product.productId)
+      }
+    })
     res.json(idCart)
   })
+  .catch(next)
 })
             /* //////////// */
           /* ADD ITEM TO CART */
@@ -24,40 +26,44 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   let num = req.body.productQuantity || 1;
-  let cart = [req.body.productId] || req.body.guestCart;
-                /* IF THE USER IS LOGGED IN*/
-  if (req.session.passport && req.session.passport.user) {
-    const userId = req.session.passport.user;
-    //do promise.all on the cart?
-    Promise.all(cart.map((productIdStr) => {
-      const productId = +productIdStr
-      Cart.findOne({ where: { userId, productId } })
-      .then(item => {
-        /* IF THE ITEM IS ALREADY PRESENT*/
-        if (item) {
-          item
-            .update({ quantity: item.getDataValue('quantity') + num })
-            .then(() => {
-              Cart.findAll({ where: { userId } }).then(cart => {
-                let idCart = cart.map((product) => product.id)
-                res.json(idCart);
-              });
-            });
-        } else {
-          User.findById(userId).then(user => {
-            user.addProduct(productId)
-            .then(() => {
-              Cart.findAll({ where: { userId } }).then(cart => {
-                let idCart = cart.map((product) => product.id)
-                res.json(idCart);
-              });
+  let productId = +req.body.productId;
+  const userId = req.user.id;
+    Cart.findOne({ where: { userId, productId } })
+    .then(item => {
+      /* IF THE ITEM IS ALREADY PRESENT*/
+      if (item) {
+        item
+          .update({ quantity: item.getDataValue('quantity') + num })
+          .then(() => {
+            Cart.findAll({ where: { userId } }).then(cart => {
+              let idCart = []
+              cart.forEach((product) => {
+                for (let i = 0; i < product.quantity; i++) {
+                  idCart.push(product.productId)
+                }
+              })
+              res.json(idCart);
             });
           });
-        }
-      })
-    }))
-      .catch(next);
-  }
+      } else {
+        User.findById(userId).then(user => {
+          user.addProduct(productId)
+          .then(() => {
+            Cart.findAll({ where: { userId } }).then(cart => {
+              let idCart = []
+              cart.forEach((product) => {
+                for (let i = 0; i < product.quantity; i++) {
+                  idCart.push(product.productId)
+                }
+              })
+              res.json(idCart);
+            });
+          });
+        });
+      }
+    })
+  // }))
+    .catch(next);
 })
 
 
@@ -65,26 +71,29 @@ router.post('/', (req, res, next) => {
         /* DELETE ITEM FROM CART */
           /* ///////////// */
 
-router.delete('/:productId', (req, res, next) => {
-  if (req.session.passport && req.session.passport.user) { //if the user is logged in
-    Cart.destroy({
-      where: { //go into the user cart database3
-        userId: req.session.passport.user,
-        productId: req.params.productId
+router.delete('/:productId', async (req, res, next) => {
+  try {
+    const userId = req.session.passport.user
+    const productId = +req.params.productId
+    const item = await Cart.findOne({ where: { userId, productId } })
+    //updated the quantity
+    if (item.quantity === 1) {
+      await item.destroy()
+    }
+    else {
+      let quantity = item.quantity - 1
+      await item.update({ quantity })
+    }
+    const cart = await Cart.findAll({ where: { userId } })
+    let idCart = []
+    cart.forEach((product) => {
+      for (let i = 0; i < product.quantity; i++) {
+        idCart.push(product.productId)
       }
     })
-    .then(() => res.status(204).send('Delete successful!'))
-    .catch(next)
-
-  } else { //if they are a guest user
-    let myGuest = Guest.findOne({where: {guestSessionId: req.session.id}})
-    GuestCart.destroy({
-      where: { //go into the guest database
-        guestId: myGuest.id,
-        productId: req.params.productId
-      }
-    })
-    .then(() => res.status(204).send('Delete Successful!'))
-    .catch(next)
+    res.json(idCart);
+  }
+  catch (err) {
+    next(err)
   }
 })

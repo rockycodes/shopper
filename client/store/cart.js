@@ -1,5 +1,5 @@
 import axios from 'axios';
-import history from '../history';
+
 
 /**
  * ACTION TYPES
@@ -49,14 +49,12 @@ export const addGuestItemToCart = (productId) => dispatch => {
   let action = getCart(udpatedCart)
   dispatch(action)
 }
-  
 
 export const removeItemFromCart = (product) => (dispatch) => {
   axios
     .delete(`/api/cart/${product.id}`)
-    .then(() => {
-      const productId = product.id;
-      let action = removeFromCart(productId);
+    .then(res => {
+      let action = getCart(res.data);
       dispatch(action);
     })
     .catch(err => console.log(err));
@@ -72,32 +70,32 @@ export const removeGuestItemFromCart = (productId) => dispatch => {
   dispatch(action)
 }
 
-export const getTheCart = () => dispatch => {
-  //check if there is a cart on local storage, if there is, post it to the backend and then get the cart
+export const getTheCart = () => async dispatch => {
+  // check if there is a cart on local storage, if there is, post it to the backend and then get the cart
+  try {
     if (localStorage.getItem('cart')) {
-      let guestCart = localStorage.getItem('cart').split(',')
-        axios
-        .post(`/api/cart`, guestCart)
-        .then(res => {
-        let action = getCart(res.data);
-        dispatch(action);
-        localStorage.removeItem('cart')
-      })
+      const guestCart = localStorage.getItem('cart').split(',')
+      for (const productId of guestCart) {
+        await axios.post(`/api/cart`, {productId})
+      }
+      localStorage.removeItem('cart')
     }
-    axios
-      .get('/api/cart')
-      .then(res => {
-        let action = getCart(res.data);
-        dispatch(action);
-      })
-      .catch(err => console.log(err))
-    }
+    const res = await axios.get('/api/cart')
+    const action = getCart(res.data);
+    dispatch(action);
+  }
+  catch (err) {
+    console.log(err)
+  }
+}
 
 export const getTheGuestCart = () => dispatch => {
-  let guestCart = localStorage.getItem('cart').split(',')
-  let action = getCart(guestCart)
-  dispatch(action)
+  if (localStorage.getItem('cart')){
+    let guestCart = localStorage.getItem('cart').split(',')
+    let action = getCart(guestCart)
+    dispatch(action)
   }
+}
 
 export const clearCurrentCart = () => dispatch => {
   let action = clearCart();
@@ -111,8 +109,6 @@ export default function(state = cart, action) {
   switch (action.type) {
     case GET_CART:
       return action.cart;
-    case REMOVE_FROM_CART:
-      return [...state.filter(item => item.productId !== action.productId)];
     case CLEAR_CART:
       return [];
     default:
