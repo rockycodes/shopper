@@ -24,6 +24,7 @@ function CartDetails(props) {
       if (productToReturn[0]) productsArr.push(productToReturn[0]);
     })
   }
+  console.log(props.user)
 
   return (
     cart.length ?

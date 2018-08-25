@@ -6,7 +6,7 @@ import axios from 'axios';
  */
 const GET_CART = 'GET_CART';
 //const ADD_TO_CART = 'ADD_TO_CART';
-const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
+// const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
 const CLEAR_CART = 'CLEAR_CART';
 
 /**
@@ -19,7 +19,7 @@ const cart = [];
  */
 const getCart = cart => ({ type: GET_CART, cart });
 //const addToCart = product => ({ type: ADD_TO_CART, product });
-const removeFromCart = productId => ({ type: REMOVE_FROM_CART, productId });
+// const removeFromCart = productId => ({ type: REMOVE_FROM_CART, productId });
 const clearCart = () => ({ type: CLEAR_CART});
 
 /**
